@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<head>
+    <style>
+        li {
+            margin-bottom: 5px;
+        }
+        textarea {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Example CRUD</h1>
+    <ul>
+        <li><button onclick="getProducts()">Get Products</button></li>
+        <li><button onclick="getProduct()">Get Product</button></li>
+        <li><button onclick="createProduct()">Create Product</button></li>
+        <li><button onclick="updateProduct()">Update Product</button></li>
+        <li><button onclick="deleteProduct()">Delete Product</button></li>
+    </ul>
+    <textarea id="text_response" rows="20"></textarea>
+    <script>
+        function showResponse(res) {
+            res.text().then(text => {
+                let contentType = res.headers.get('content-type')
+                if (contentType && contentType.startsWith('application/json')) {
+                    text = JSON.stringify(JSON.parse(text), null, 4)
+                }
+                document.getElementById('text_response').innerHTML = text
+            })
+        }
+        function getProducts() {
+            fetch('/api/products').then(showResponse)
+        }
+        function getProduct() {
+            let id = prompt('Input product id')
+            fetch('/api/products/' + id).then(showResponse)
+        }
+        function createProduct() {
+            let name = prompt('Input product name')
+            let price = parseFloat(prompt('Input product price'))
+            fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, price })
+            }).then(showResponse)
+        }
+        function updateProduct() {
+            let id = parseInt(prompt('Input product id to update'))
+            let name = prompt('Input new product name')
+            let price = parseFloat(prompt('Input new product price'))
+            fetch('/api/products/' + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, price })
+            }).then(showResponse)
+        }
+        function deleteProduct() {
+            let id = prompt('Input product id to delete')
+            fetch('/api/products/' + id, {
+                method: 'DELETE'
+            }).then(showResponse)
+        }
+    </script>
+</body>
+</html>
